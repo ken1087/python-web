@@ -50,6 +50,22 @@ def board_list_get():
 def board_list_post():
 #	return "<img src=" + url_for("static", filename = "1.png") + ">"
 	return "POST"
+
+@app.route("/login", methods=["POST","GET"])
+def login():
+	if request.method == "POST":
+		if (request.form["uname"] == "iot"
+				and request.form["passwd"] == "2019"):
+			session["logged_in"] = True
+			session["uname"] = request.form["uname"]
+			return request.form["uname"] + "님 환영합니다."
+		else:
+			return "로그인 실패"
+	else:
+		return "잘못된 접근"
+
+app.secret_key = "iot_key"
+
 if __name__ == "__main__":
 	app.run(host = "192.168.0.201")
 
