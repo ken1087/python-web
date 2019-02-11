@@ -24,6 +24,10 @@ def IoT_user_name(uname):
 def IoT_user_number_id(num_id):
 	return "ID Number : %d" % num_id
 
+@app.route("/login_test")
+def login_test():
+	return render_template('login.html')
+
 @app.route("/get_test", methods=["GET"])
 def get_test():
 	if request.method == "GET":
