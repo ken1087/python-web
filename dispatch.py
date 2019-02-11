@@ -6,6 +6,7 @@ sys.setdefaultencoding('utf8')
 from flask import Flask, Response, make_response, url_for
 
 app = Flask(__name__)
+app.debug = True
 
 @app.route("/log")
 def IoT_logging_test():
