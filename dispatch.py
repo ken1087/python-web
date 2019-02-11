@@ -3,7 +3,7 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-from flask import Flask, Response, make_response, url_for
+from flask import Flask, Response, make_response, url_for, render_template, request, session
 
 app = Flask(__name__)
 app.debug = True
@@ -23,6 +23,17 @@ def IoT_user_name(uname):
 @app.route("/user/<int:num_id>")
 def IoT_user_number_id(num_id):
 	return "ID Number : %d" % num_id
+
+@app.route("/get_test", methods=["GET"])
+def get_test():
+	if request.method == "GET":
+		if (request.args.get("uname") == "iot"
+				and request.args.get("passwd") == "2019"):
+			return request.args.get("uname") + "님 환영합니다."
+		else:
+			return "로그인 실패"
+	else:
+		return "다시 시도해 주세용"
 
 @app.route("/board", methods=['GET'])
 #def IoT_Board():
