@@ -24,10 +24,6 @@ def IoT_user_name(uname):
 def IoT_user_number_id(num_id):
 	return "ID Number : %d" % num_id
 
-@app.route("/login_test")
-def login_test():
-	return render_template('login.html')
-
 @app.route("/get_test", methods=["GET"])
 def get_test():
 	if request.method == "GET":
@@ -51,9 +47,20 @@ def board_list_post():
 #	return "<img src=" + url_for("static", filename = "1.png") + ">"
 	return "POST"
 
+@app.route("/login_test")
+def login_test():
+	session["logged_in"] = False
+	return render_template("login.html")
+
 @app.route("/login", methods=["POST","GET"])
 def login():
 	if request.method == "POST":
+		session_cheak = request.form.get("uname", None)
+		if None == session_cheak:
+			if "logged_in" in session:
+				return session["uname"] + "님 환영합니다."
+			else:
+				return login_test()
 		if (request.form["uname"] == "iot"
 				and request.form["passwd"] == "2019"):
 			session["logged_in"] = True
@@ -62,7 +69,14 @@ def login():
 		else:
 			return "로그인 실패"
 	else:
-		return "잘못된 접근"
+#return "잘못된 접근"
+		try:
+			if session["logged_in"] == True:
+				return session["uname"] + "님 환영합니다."
+			else:
+				return login_test() 
+		except:
+			return login_test()
 
 app.secret_key = "iot_key"
 
