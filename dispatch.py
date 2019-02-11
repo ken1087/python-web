@@ -47,9 +47,14 @@ def board_list_post():
 #	return "<img src=" + url_for("static", filename = "1.png") + ">"
 	return "POST"
 
+@app.route("/logout")
+def logout():
+	session["logged_in"] = False
+	session.pop("uname", None)
+	return "로그아웃 되셨습니다."
+
 @app.route("/login_test")
 def login_test():
-	session["logged_in"] = False
 	return render_template("login.html")
 
 @app.route("/login", methods=["POST","GET"])
@@ -58,25 +63,28 @@ def login():
 		session_cheak = request.form.get("uname", None)
 		if None == session_cheak:
 			if "logged_in" in session:
-				return session["uname"] + "님 환영합니다."
-			else:
-				return login_test()
+				if True == session["logged_in"]:
+					return session["uname"] + "님 환영합니다."
+			return login_test()
 		if (request.form["uname"] == "iot"
 				and request.form["passwd"] == "2019"):
 			session["logged_in"] = True
 			session["uname"] = request.form["uname"]
 			return request.form["uname"] + "님 환영합니다."
-		else:
-			return "로그인 실패"
+		return "로그인 실패"
 	else:
 #return "잘못된 접근"
-		try:
-			if session["logged_in"] == True:
+		if "logged_in" in session:
+			if True == session["logged_in"]:
 				return session["uname"] + "님 환영합니다."
-			else:
-				return login_test() 
-		except:
-			return login_test()
+		return login_test()
+
+@app.route("/template")
+@app.route("/template/")
+@app.route("/template/<iot_number>")
+def template_test(iot_number=None):
+	iot_members = ["최성주", "주수홍", "최재원","kangin"]
+	return render_template("template_test.html", iot_number=iot_number, iot_members=iot_members)
 
 app.secret_key = "iot_key"
 
