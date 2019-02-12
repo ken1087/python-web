@@ -4,6 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 from flask import Flask, Response, make_response, url_for, render_template, request, session, redirect
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 app.debug = True
@@ -95,6 +96,7 @@ def iot():
 	result_status	= request.status_code
 	if True == result_req.ok:
 		obj_soup	= BeautifulSoup(result_txt, "html.parser")
+		iot_data	= obj_soup.select("table.ej-tbl>tbody>tr>td>a")
 		return render_template("main.html", iot_data = iot_data)
 	else:
 		return "가져오기 실패"
