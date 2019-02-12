@@ -1,9 +1,9 @@
 #!/user/bin/ python
-#-*-coding:utf-8-*-
+#-*=coding:utf-8-*-
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-from flask import Flask, Response, make_response, url_for, render_template, request, session
+from flask import Flask, Response, make_response, url_for, render_template, request, session, redirect
 
 app = Flask(__name__)
 app.debug = True
@@ -85,6 +85,36 @@ def login():
 def template_test(iot_number=None):
 	iot_members = ["최성주", "주수홍", "최재원","kangin"]
 	return render_template("template_test.html", iot_number=iot_number, iot_members=iot_members)
+
+@app.route("/iot")
+@app.route("/iot/")
+def iot():
+	result_req		= request.get("http://busanit.ac.kr/p/?j=41")
+	result_txt		= request.req.text
+	result_head		= request.headers
+	result_status	= request.status_code
+	if True == result_req.ok:
+		obj_soup	= BeautifulSoup(result_txt, "html.parser")
+		return render_template("main.html", iot_data = iot_data)
+	else:
+		return "가져오기 실패"
+
+@app.route("/gugu")
+@app.route("/gugu/")
+@app.route("/gugu/<int:iot_num>")
+def iot_gugu(iot_num=None):
+	return render_template("gugu.html", iot_num = iot_num)
+
+@app.route("/calcul", methods=["POST"])
+def calcul(iot_num=None):
+	if request.method == "POST":
+		if "" == request.form["iot_num"]:
+			cal_num = None
+		else:
+			cal_num = request.form["iot_num"]
+	else:
+		cal_num = None
+	return redirect(url_for("iot_gugu", iot_num = cal_num))
 
 app.secret_key = "iot_key"
 
