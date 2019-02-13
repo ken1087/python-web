@@ -93,7 +93,8 @@ def template_test(iot_number=None):
 def iot():
 #	result_req		= requests.get("http://busanit.ac.kr/p/?j=41")
 #	result_req		= requests.get("https://media.daum.net/")
-	result_req		= requests.get("https://media.daum.net/ranking/bestreply/")
+#	result_req		= requests.get("https://media.daum.net/ranking/bestreply/")
+	result_req		= requests.get("https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1=105")
 	result_txt		= result_req.text
 	result_head		= result_req.headers
 	result_status	= result_req.status_code
@@ -101,7 +102,8 @@ def iot():
 		obj_soup	= BeautifulSoup(result_txt, "html.parser")
 #		iot_data	= obj_soup.select("table.ej-tbl>tbody>tr>td>a")
 #	iot_data	= obj_soup.select("div.box_headline>ul.list_headline>li>strong.tit_g>a")
-		iot_data	= obj_soup.select("div.cont_thumb>strong.tit_thumb>a")
+#		iot_data	= obj_soup.select("div.cont_thumb>strong.tit_thumb>a")
+		iot_data	= obj_soup.select("div.cluster_body>ul.cluster_list>li.cluster_item>div.cluster_text>a")
 		return render_template("main.html", iot_data = iot_data)
 	else:
 		return "가져오기 실패"
@@ -122,6 +124,12 @@ def calcul(iot_num=None):
 	else:
 		cal_num = None
 	return redirect(url_for("iot_gugu", iot_num = cal_num))
+
+@app.route("/test_temp")
+def iot_test_temp():
+	iot_string = "파이썬ㄷㄷㄷㄷㄷ"
+	iot_list = (1000, 1324, 5745, 2458, 3456)
+	return render_template('template.html', my_string = iot_string, my_list = iot_list)
 
 app.secret_key = "iot_key"
 
