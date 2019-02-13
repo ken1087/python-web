@@ -1,10 +1,14 @@
 #!/user/bin/ python
 #-*=coding:utf-8-*-
 import sys
+from subprocess import PIPE, Popen 
+import psutil
 import requests
+import RPi.GPIO as GPIO
 reload(sys)
+from camera import Camera
 sys.setdefaultencoding('utf8')
-from flask import Flask, Response, make_response, url_for, render_template, request, session, redirect
+from flask import Flask, Response, make_response, url_for, render_template, request, session, redirect 
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
@@ -130,6 +134,63 @@ def iot_test_temp():
 	iot_string = "파이썬ㄷㄷㄷㄷㄷ"
 	iot_list = (1000, 1324, 5745, 2458, 3456)
 	return render_template('template.html', my_string = iot_string, my_list = iot_list)
+
+def iot_measure_temp():
+	process = Popen(["vcgencmd", "measure_temp"], stdout=PIPE) 
+	output, _error = process.communicate() 
+	return float(output[output.index("=") + 1:output.rindex("'")])
+
+@app.route("/info")
+def iot_sys_info():
+#=====================================================
+	cpu_temp			= iot_measure_temp()
+	cpu_percent         = psutil.cpu_percent() 
+	cpu_count           = psutil.cpu_count()
+#=====================================================
+	memory				= psutil.virtual_memory()
+	mem_total			= memory.total
+	mem_percent			= memory.percent
+#=====================================================
+	hd_disk				= psutil.disk_usage("/")
+	disk_percent		= hd_disk.percent
+#=====================================================
+
+	iot_sys_info_dict	= {
+						    "CPU 온도"		:cpu_temp
+							,"CPU 사용율"	:cpu_percent
+							,"CPU 갯수"		:cpu_count
+							,"전체메모리"	:mem_total
+							,"메모리사용율"	:mem_percent
+							,"하드디스크"	:disk_percent}
+
+	return render_template("hw_info.html", hw_info = iot_sys_info_dict)
+
+LedPin = 19
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(LedPin,GPIO.OUT)
+
+@app.route("/led/<iot_state>")
+def Led_OnOff(iot_state):
+	if "on"		== iot_state:
+		GPIO.output(LedPin, GPIO.HIGH)
+	if "off"	== iot_state:
+		GPIO.output(LedPin, GPIO.LOW)
+	if "toggle" == iot_state:
+		GPIO.output(LedPin, not GPIO.input(LedPin))
+	return iot_sys_info()
+
+@app.route("/camera")
+def iot_camera():
+	return render_template("camera.html")
+
+def iot_camera_start(camera): 
+	while True: 
+		frame = camera.get_frame() 
+		yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n") 
+		    
+@app.route("/camera_run") 
+def iot_camera_run(): 
+	return Response(iot_camera_start(Camera()), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 app.secret_key = "iot_key"
 
