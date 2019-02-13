@@ -1,0 +1,20 @@
+﻿{% extends "layout.html" %}
+{% block content %}
+<table class="table"> 
+	{% for key, value in hw_info.iteritems() %} 
+	<tr> 
+		<th> {{ key }} </th> 
+		<td> {{ value }} </td> 
+	</tr> 
+	{% endfor %} 
+	</br>
+	<TR>
+	     <TD colspan = "2"  align = "center">
+		<button id = "update" class = "button" onclick = "window.location.href = '/info'">UPDATE</button>
+	     </TD>
+	</TR>
+  </table>
+  <button id="led_on" class="button" onclick="window.location.href='/led/on'">ON</button> 
+  <button id="led_off" class="button" onclick="window.location.href='/led/off'">OFF</button> 
+  <button id="led_off" class="button" onclick="window.location.href='/led/toggle'">Toggle</button>
+{% endblock %}
